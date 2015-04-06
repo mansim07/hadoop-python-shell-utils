@@ -1,0 +1,69 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+#1 Creates a new directory in Hadoop. Removes if the directory already exists.
+def mkdirHadoop_ifExistsRemove(dirName):
+    try:
+        stderr1 = ''
+        stderr2 = ''
+        stderr3 = ''
+        test_dir = 'hadoop fs -test -d' + ' ' + dirName
+        rm_dir = 'hadoop fs -rm -r  ' + ' ' + dirName
+        mk_dir = 'hadoop fs -mkdir -p ' + ' ' + dirName
+        test_dir_proc = subprocess.Popen(test_dir,
+                stdout=subprocess.PIPE, shell=True,
+                stderr=subprocess.PIPE)
+        (stdout1, stderr1) = test_dir_proc.communicate()
+
+        return_code_test = test_dir_proc.returncode
+
+        if return_code_test == 0:
+            rm_dir_proc = subprocess.Popen(rm_dir,
+                    stdout=subprocess.PIPE, shell=True,
+                    stderr=subprocess.PIPE)
+            (stdout2, stderr2) = rm_dir_proc.communicate()
+            return_code_rm = rm_dir_proc.returncode
+
+        mk_dir_proc = subprocess.Popen(mk_dir, stdout=subprocess.PIPE,
+                shell=True, stderr=subprocess.PIPE)
+        (stdout3, stderr3) = mk_dir_proc.communicate()
+        return_code_mk = mk_dir_proc.returncode
+
+        if return_code_mk == 0:
+            return True
+        else:
+            return stderr1 + stderr2 + stderr3
+    except Exception, e:
+        return stderr1 + stderr2 + stderr3
+
+#2 Function executes the shell command and captures and returns the actual return code
+
+def execShellCommands(command):
+    try:
+        command_proc = subprocess.Popen(command,
+                stdout=subprocess.PIPE, shell=True)
+        command_proc.communicate()
+        return_code_test = command_proc.returncode
+        return return_code_test
+    except Exception, e:
+        return -1
+
+#3 Unzips and moves the file from local to Hdfs
+def unzipAndCopyToHDFS(localFileName,hdfsFileName) :
+        command="unzip -p" + " " + localFileName + " | " +  "hadoop fs -put  -  " +  hdfsFileName
+        return  execShellCommands(command)
+#4 Creates empty directory in hadoop        
+ def createEmptyHDFSFile(hdfsFileName) :
+        command= "hadoop fs -touchz " +  hdfsFileName
+        return  execShellCommands(command)
+#5 move the files from Local system to Hadoop 
+def MoveToHDFS(localDirName,hdfsDirName) :
+        command="hadoop fs -moveFromLocal    "  + localDirName + "/* "  +  hdfsDirName
+        return  execShellCommands(command)
+
+#6 copy the files from local system to hadoop         
+def CopyToHDFS(localDirName,hdfsDirName) :
+        command="hadoop fs -copyFromLocal    "  + localDirName + "/* "  +  hdfsDirName
+        return  execShellCommands(command)
+
+#Similarly any hadoop fs commands can be executed through Python
