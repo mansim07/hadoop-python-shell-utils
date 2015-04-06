@@ -1,0 +1,47 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+#Code Snippet # 1
+#Description : Creates a new directory in Hadoop. Removes if the directory already exists.
+#Usage :       mkdirHadoop_ifExistsRemove(Absoule Path of the Hadoop directory to be created) 
+#Comments :    This snippet handles exceptions and also captures the actual return code which says if 
+#              the action was a success or a failure
+
+
+def mkdirHadoop_ifExistsRemove(dirName):
+    try:
+        stderr1 = ''
+        stderr2 = ''
+        stderr3 = ''
+        test_dir = 'hadoop fs -test -d' + ' ' + dirName
+        rm_dir = 'hadoop fs -rm -r  ' + ' ' + dirName
+        mk_dir = 'hadoop fs -mkdir -p ' + ' ' + dirName
+        test_dir_proc = subprocess.Popen(test_dir,
+                stdout=subprocess.PIPE, shell=True,
+                stderr=subprocess.PIPE)
+        (stdout1, stderr1) = test_dir_proc.communicate()
+
+        return_code_test = test_dir_proc.returncode
+
+        if return_code_test == 0:
+            rm_dir_proc = subprocess.Popen(rm_dir,
+                    stdout=subprocess.PIPE, shell=True,
+                    stderr=subprocess.PIPE)
+            (stdout2, stderr2) = rm_dir_proc.communicate()
+            return_code_rm = rm_dir_proc.returncode
+
+        mk_dir_proc = subprocess.Popen(mk_dir, stdout=subprocess.PIPE,
+                shell=True, stderr=subprocess.PIPE)
+        (stdout3, stderr3) = mk_dir_proc.communicate()
+        return_code_mk = mk_dir_proc.returncode
+
+        if return_code_mk == 0:
+            return True
+        else:
+            return stderr1 + stderr2 + stderr3
+    except Exception, e:
+        return stderr1 + stderr2 + stderr3
+
+
+
+			
