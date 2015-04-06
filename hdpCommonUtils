@@ -1,5 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import shutil
+import os
+import logging
+import glob
+import subprocess
 
 #1 Creates a new directory in Hadoop. Removes if the directory already exists.
 def mkdirHadoop_ifExistsRemove(dirName):
